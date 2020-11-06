@@ -49,3 +49,7 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
+
+# zmk5
+.vscode
+.DS_STORE
