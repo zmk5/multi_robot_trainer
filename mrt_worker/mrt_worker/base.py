@@ -42,11 +42,10 @@ class WorkerBase(Node):
                 ('hyperparameter.epsilon', 1.0),
                 ('hyperparameter.mse', 0.05),
                 ('database.local_size', 10000),
-                ('distribution.initial', [0.1, 0.4, 0.4, 0.1]),
-                ('distribution.target', [0.4, 0.1, 0.1, 0.4]),
                 ('training_delay', 100),
                 ('decay_rate', 500),
                 ('batch_size', 16),
+                ('hidden_layers', [16, 16]),
             ]
         )
         self._wp = WorkerParameters(
@@ -76,6 +75,7 @@ class WorkerBase(Node):
             self._policy = WorkerPolicyDQN(
                 self._wp.n_states, self._wp.n_actions,
                 self._wp.alpha, self._wp.gamma,
+                self.get_parameter('hidden_layers').value,
                 self.get_parameter('use_gpu').value
             )
 
@@ -83,6 +83,7 @@ class WorkerBase(Node):
             self._policy = WorkerPolicyDDQN(
                 self._wp.n_states, self._wp.n_actions,
                 self._wp.alpha, self._wp.gamma,
+                self.get_parameter('hidden_layers').value,
                 self.get_parameter('use_gpu').value
             )
 
@@ -90,6 +91,7 @@ class WorkerBase(Node):
             self._policy = WorkerPolicyREINFORCE(
                 self._wp.n_states, self._wp.n_actions,
                 self._wp.alpha, self._wp.gamma,
+                self.get_parameter('hidden_layers').value,
                 self.get_parameter('use_gpu').value
             )
 
@@ -97,6 +99,7 @@ class WorkerBase(Node):
             self._policy = WorkerPolicyActorCriticShared(
                 self._wp.n_states, self._wp.n_actions,
                 self._wp.alpha, self._wp.gamma,
+                self.get_parameter('hidden_layers').value,
                 self.get_parameter('use_gpu').value
             )
 
@@ -104,6 +107,7 @@ class WorkerBase(Node):
             self._policy = WorkerPolicyActorCriticDual(
                 self._wp.n_states, self._wp.n_actions,
                 self._wp.alpha, self._wp.gamma,
+                self.get_parameter('hidden_layers').value,
                 self.get_parameter('use_gpu').value
             )
 

@@ -23,25 +23,32 @@ class ServerPolicyDQN():
         '_neural_net',
         '_optimizer',
         '_weights',
+        '_hidden_layer_sizes',
     ]
 
     def __init__(
             self,
             n_states: int,
             n_actions: int,
-            alpha: float) -> None:
+            alpha: float,
+            hidden_layer_sizes: List[int]) -> None:
         """Initialize the PolicyDQN class."""
         self._n_states = n_states
         self._n_actions = n_actions
         self._alpha = alpha
+        self._hidden_layer_sizes = hidden_layer_sizes
+
+        # Check to make sure hidden layer sizes are correct.
+        if len(hidden_layer_sizes) != 2:
+            raise ValueError('Hidden layers must be a list of size 2!')
 
         # Set Q-function Neural Net Approximator and Target Network
         self._neural_net = keras.Sequential([
             keras.layers.Dense(
-                n_vertices * n_vertices, activation='relu',
+                hidden_layer_sizes[0], activation='relu',
                 input_shape=(n_states,)),
             keras.layers.Dense(
-                n_vertices * n_vertices, activation='relu'),
+                hidden_layer_sizes[1], activation='relu'),
             keras.layers.Dense(n_actions, activation='softmax')
         ])
 
@@ -62,21 +69,20 @@ class ServerPolicyDQN():
     def optimize_from_request(
             self,
             n_states: int,
-            n_vertices: int,
             n_actions: int,
             request: Gradients.Request) -> None:
         """Optimize the policy from a gradient request."""
         self.optimize([
             np.array(request.layer.input_layer).reshape(
                 n_states,
-                n_vertices * n_vertices),
+                self._hidden_layer_sizes[0]),
             np.array(request.layer.hidden_0),
             np.array(request.layer.middle_0).reshape(
-                n_vertices * n_vertices,
-                n_vertices * n_vertices),
+                self._hidden_layer_sizes[0],
+                self._hidden_layer_sizes[1]),
             np.array(request.layer.hidden_1),
             np.array(request.layer.output_layer).reshape(
-                n_vertices * n_vertices,
+                self._hidden_layer_sizes[1],
                 n_actions),
             np.array(request.layer.output)
         ])

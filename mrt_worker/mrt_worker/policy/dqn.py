@@ -39,6 +39,7 @@ class WorkerPolicyDQN():
         '_target_net',
         '_loss_function',
         '_gradients',
+        '_hidden_layer_sizes',
     ]
 
     def __init__(
@@ -47,12 +48,14 @@ class WorkerPolicyDQN():
             n_actions: int,
             alpha: float,
             gamma: float,
+            hidden_layer_sizes: List[int],
             use_gpu: bool = False) -> None:
         """Initialize the PolicyDQN class."""
         self._n_states = n_states
         self._n_actions = n_actions
         self._alpha = alpha
         self._gamma = gamma
+        self._hidden_layer_sizes = hidden_layer_sizes
 
         # Turn off GPU, if needed.
         if not use_gpu:
@@ -61,18 +64,18 @@ class WorkerPolicyDQN():
         # Set Q-function Neural Net Approximator and Target Network
         self._neural_net = keras.Sequential([
             keras.layers.Dense(
-                n_vertices * n_vertices, activation='relu',
+                hidden_layer_sizes[0], activation='relu',
                 input_shape=(n_states,)),
             keras.layers.Dense(
-                n_vertices * n_vertices, activation='relu'),
+                hidden_layer_sizes[1], activation='relu'),
             keras.layers.Dense(n_actions, activation='softmax')
         ])
         self._target_net = keras.Sequential([
             keras.layers.Dense(
-                n_vertices * n_vertices, activation='relu',
+                hidden_layer_sizes[0], activation='relu',
                 input_shape=(n_states,)),
             keras.layers.Dense(
-                n_vertices * n_vertices, activation='relu'),
+                hidden_layer_sizes[1], activation='relu'),
             keras.layers.Dense(n_actions, activation='softmax')
         ])
 
@@ -181,14 +184,14 @@ class WorkerPolicyDQN():
         weights.append(
             np.array(response.layer.input_layer).reshape(
                 self._n_states,
-                self._n_vertices * self._n_vertices))
+                self._hidden_layer_sizes[0]))
         weights.append(np.array(response.layer.hidden_0))
         weights.append(np.array(response.layer.middle_0).reshape(
-            self._n_vertices * self._n_vertices,
-            self._n_vertices * self._n_vertices))
+            self._hidden_layer_sizes[0],
+            self._hidden_layer_sizes[1]))
         weights.append(np.array(response.layer.hidden_1))
         weights.append(np.array(response.layer.output_layer).reshape(
-            self._n_vertices * self._n_vertices,
+            self._hidden_layer_sizes[1],
             self._n_actions))
         weights.append(np.array(response.layer.output))
         self.set_policy_weights(weights)

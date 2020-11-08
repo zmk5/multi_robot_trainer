@@ -43,6 +43,7 @@ class ServerSyncDual(Node):
                 ('hyperparameter.epsilon', 0.99),
                 ('training_delay', 100),
                 ('decay_rate', 500),
+                ('hidden_layers', [16, 16]),
             ]
         )
         self._sp = ServerParameters(
@@ -80,8 +81,8 @@ class ServerSyncDual(Node):
         # Initialize policy for inference and training.
         if policy_type == 'A2CD':
             self._policy = ServerPolicyActorCriticDual(
-                self._sp.n_vertices, self._sp.n_actions, self._sp.n_states,
-                self._sp.alpha)
+                self._sp.n_states, self._sp.n_actions, self._sp.alpha,
+                self.get_parameter('hidden_layers').value)
 
         # Create ROS service servers.
         self._srv: Dict[str, Service] = {
@@ -122,7 +123,6 @@ class ServerSyncDual(Node):
         if self._episodes[request.name][request.id] >= self._sp.training_delay:
             self._policy.optimize_from_request(
                 self._sp.n_states,
-                self._sp.n_vertices,
                 self._sp.n_actions,
                 request
             )

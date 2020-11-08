@@ -37,7 +37,7 @@ class WorkerPolicyREINFORCE():
         '_target_net',
         '_loss_function',
         '_gradients',
-        '_average_gradients',
+        '_hidden_layer_sizes',
     ]
 
     def __init__(
@@ -46,12 +46,14 @@ class WorkerPolicyREINFORCE():
             n_actions: int,
             alpha: float,
             gamma: float,
+            hidden_layer_sizes: List[int],
             use_gpu: bool = False) -> None:
         """Initialize the WorkerPolicyEINFORCE class."""
         self._n_states = n_states
         self._n_actions = n_actions
         self._alpha: float = alpha
         self._gamma: float = gamma
+        self._hidden_layer_sizes = hidden_layer_sizes
 
         # Turn off GPU, if needed.
         if not use_gpu:
@@ -60,11 +62,11 @@ class WorkerPolicyREINFORCE():
         # Set the neural net approximator
         self._neural_net = keras.Sequential([
             keras.layers.Dense(
-                self._n_vertices * self._n_vertices,
+                hidden_layer_sizes[0],
                 activation='relu',
                 input_shape=(self._n_states,)),
             keras.layers.Dense(
-                self._n_vertices * self._n_vertices,
+                hidden_layer_sizes[1],
                 activation='relu'),
             keras.layers.Dense(self._n_actions)  # , activation='softmax')
         ])
@@ -105,7 +107,6 @@ class WorkerPolicyREINFORCE():
             batch_size: int,
             previous_future_ret: float = 0.0) -> np.ndarray:
         """Calculate returns for each element in the sample batch."""
-        # done = np.where(batch[REWARD] == 1, 1, 0)  # 0, 1)
         ret_value = np.zeros_like(batch[REWARD])
         future_ret = previous_future_ret
         for t in reversed(range(batch_size + 1)):
@@ -170,14 +171,14 @@ class WorkerPolicyREINFORCE():
         weights.append(
             np.array(response.layer.input_layer).reshape(
                 self._n_states,
-                self._n_vertices * self._n_vertices))
+                self._hidden_layer_sizes[0]))
         weights.append(np.array(response.layer.hidden_0))
         weights.append(np.array(response.layer.middle_0).reshape(
-            self._n_vertices * self._n_vertices,
-            self._n_vertices * self._n_vertices))
+            self._hidden_layer_sizes[0],
+            self._hidden_layer_sizes[1]))
         weights.append(np.array(response.layer.hidden_1))
         weights.append(np.array(response.layer.output_layer).reshape(
-            self._n_vertices * self._n_vertices,
+            self._hidden_layer_sizes[1],
             self._n_actions))
         weights.append(np.array(response.layer.output))
         self.set_policy_weights(weights)

@@ -6,7 +6,7 @@
   <description>
     Server package for training robots. Sends weights and receives gradients.
   </description>
-  <maintainer email="zahi@solrobotics.com">zmk5</maintainer>
+  <maintainer email="zkakish@gmail.com">zmk5</maintainer>
   <license>MIT</license>
 
   <exec_depend>rclpy</exec_depend>

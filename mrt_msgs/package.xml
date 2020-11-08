@@ -4,7 +4,7 @@
   <name>mrt_msgs</name>
   <version>0.0.1</version>
   <description>Message files for RL training topics.</description>
-  <maintainer email="zahi@solrobotics.com">zmk5</maintainer>
+  <maintainer email="zkakish@gmail.com">zmk5</maintainer>
   <license>MIT</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

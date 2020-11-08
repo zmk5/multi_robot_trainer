@@ -26,20 +26,24 @@ class ServerPolicyActorCriticShared():
         '_neural_net',
         '_optimizer',
         '_weights',
+        '_hidden_layer_sizes',
     ]
 
     def __init__(
             self,
             n_states: int,
             n_actions: int,
-            alpha: float) -> None:
+            alpha: float,
+            hidden_layer_sizes: List[int]) -> None:
         """Initialize the ServerPolicyActorCritic class."""
         self._n_states = n_states
         self._n_actions = n_actions
         self._alpha = alpha
+        self._hidden_layer_sizes = hidden_layer_sizes
 
         # Set the neural net approximator
-        self._neural_net = ActorCriticModel(n_states, n_actions)
+        self._neural_net = ActorCriticModel(
+            n_states, n_actions, hidden_layer_sizes)
         self._neural_net.build((1, n_states))
 
         # Set tensorflow loss function and optimizer
@@ -59,25 +63,24 @@ class ServerPolicyActorCriticShared():
     def optimize_from_request(
             self,
             n_states: int,
-            n_vertices: int,
             n_actions: int,
             request: Gradients.Request) -> None:
         """Optimize the policy from a gradient request."""
         self.optimize([
             np.array(request.layer.input_layer).reshape(
                 n_states,
-                n_vertices * n_vertices),
+                self._hidden_layer_sizes[0]),
             np.array(request.layer.hidden_0),
             np.array(request.layer.middle_0).reshape(
-                n_vertices * n_vertices,
-                n_vertices * n_vertices),
+                self._hidden_layer_sizes[0],
+                self._hidden_layer_sizes[1]),
             np.array(request.layer.hidden_1),
             np.array(request.layer.output_layer).reshape(
-                n_vertices * n_vertices,
+                self._hidden_layer_sizes[1],
                 n_actions),
             np.array(request.layer.output),
             np.array(request.layer.critic_output_layer).reshape(
-                n_vertices * n_vertices,
+                self._hidden_layer_sizes[1],
                 1),
             np.array(request.layer.critic_output),
         ])
@@ -128,21 +131,24 @@ class ServerPolicyActorCriticDual():
         '_critic_net',
         '_optimizer',
         '_weights',
+        '_hidden_layer_sizes',
     ]
 
     def __init__(
             self,
             n_states: int,
             n_actions: int,
-            alpha: float) -> None:
+            alpha: float,
+            hidden_layer_sizes: List[int]) -> None:
         """Initialize the ServerPolicyActorCritic class."""
         self._n_states = n_states
         self._n_actions = n_actions
         self._alpha = alpha
+        self._hidden_layer_sizes = hidden_layer_sizes
 
         # Set the neural net approximator
-        self._neural_net = ActorModel(n_states, n_actions)
-        self._critic_net = CriticModel(n_states)
+        self._neural_net = ActorModel(n_states, n_actions, hidden_layer_sizes)
+        self._critic_net = CriticModel(n_states, hidden_layer_sizes)
         self._neural_net.build((1, n_states))
         self._critic_net.build((1, n_states))
 
@@ -168,7 +174,6 @@ class ServerPolicyActorCriticDual():
     def optimize_from_request(
             self,
             n_states: int,
-            n_vertices: int,
             n_actions: int,
             request: Gradients.Request) -> None:
         """Optimize the policy from a gradient request."""
@@ -176,18 +181,14 @@ class ServerPolicyActorCriticDual():
         self.optimize([
             np.array(request.layer.input_layer).reshape(
                 n_states,
-                n_vertices * n_vertices),
+                self._hidden_layer_sizes[0]),
             np.array(request.layer.hidden_0),
             np.array(request.layer.middle_0).reshape(
-                n_vertices * n_vertices,
-                n_vertices * n_vertices),
+                self._hidden_layer_sizes[0],
+                self._hidden_layer_sizes[1]),
             np.array(request.layer.hidden_1),
-            # np.array(request.layer.middle_1).reshape(
-            #     n_vertices * n_vertices,
-            #     n_vertices * n_vertices),
-            # np.array(request.layer.hidden_2),
             np.array(request.layer.output_layer).reshape(
-                n_vertices * n_vertices,
+                self._hidden_layer_sizes[1],
                 n_outputs),
             np.array(request.layer.output),
         ], request.name)
@@ -235,10 +236,6 @@ class ServerPolicyActorCriticDual():
         response.layer.hidden_0 = weights[1].flatten().tolist()
         response.layer.middle_0 = weights[2].flatten().tolist()
         response.layer.hidden_1 = weights[3].flatten().tolist()
-        # response.layer.middle_1 = weights[4].flatten().tolist()
-        # response.layer.hidden_2 = weights[5].flatten().tolist()
-        # response.layer.output_layer = weights[6].flatten().tolist()
-        # response.layer.output = weights[7].flatten().tolist()
         response.layer.output_layer = weights[4].flatten().tolist()
         response.layer.output = weights[5].flatten().tolist()
 

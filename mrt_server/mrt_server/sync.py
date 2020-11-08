@@ -46,6 +46,7 @@ class ServerSync(Node):
                 ('hyperparameter.epsilon', 0.99),
                 ('training_delay', 100),
                 ('decay_rate', 500),
+                ('hidden_layers', [16, 16]),
             ]
         )
         self._sp = ServerParameters(
@@ -80,23 +81,23 @@ class ServerSync(Node):
         # Initialize policy for inference and training.
         if policy_type == 'DQN':
             self._policy = ServerPolicyDQN(
-                self._sp.n_vertices, self._sp.n_actions, self._sp.n_states,
-                self._sp.alpha)
+                self._sp.n_states, self._sp.n_actions, self._sp.alpha,
+                self.get_parameter('hidden_layers').value)
 
         elif policy_type == 'DDQN':
             self._policy = ServerPolicyDDQN(
-                self._sp.n_vertices, self._sp.n_actions, self._sp.n_states,
-                self._sp.alpha)
+                self._sp.n_states, self._sp.n_actions, self._sp.alpha,
+                self.get_parameter('hidden_layers').value)
 
         elif policy_type == 'REINFORCE':
             self._policy = ServerPolicyREINFORCE(
-                self._sp.n_vertices, self._sp.n_actions, self._sp.n_states,
-                self._sp.alpha)
+                self._sp.n_states, self._sp.n_actions, self._sp.alpha,
+                self.get_parameter('hidden_layers').value)
 
         elif policy_type == 'A2C':
             self._policy = ServerPolicyActorCriticShared(
-                self._sp.n_vertices, self._sp.n_actions, self._sp.n_states,
-                self._sp.alpha)
+                self._sp.n_states, self._sp.n_actions, self._sp.alpha,
+                self.get_parameter('hidden_layers').value)
 
         # Create ROS service servers.
         self._srv: Dict[str, Service] = {
@@ -133,7 +134,6 @@ class ServerSync(Node):
         if self._episodes[request.id] >= self._sp.training_delay:
             self._policy.optimize_from_request(
                 self._sp.n_states,
-                self._sp.n_vertices,
                 self._sp.n_actions,
                 request
             )

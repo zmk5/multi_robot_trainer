@@ -42,12 +42,15 @@ class WorkerPolicyActorCriticShared(WorkerPolicyREINFORCE):
             n_actions: int,
             alpha: float,
             gamma: float,
+            hidden_layer_sizes: List[int],
             use_gpu: bool = False) -> None:
         """Initialize the ModelActorCritic class."""
-        super().__init__(n_states, n_actions, alpha, gamma, use_gpu)
+        super().__init__(
+            n_states, n_actions, alpha, gamma, hidden_layer_sizes, use_gpu)
 
         # Use Actor-Critic model instead of that within WorkerPolicyREINFORCE.
-        self._neural_net = ActorCriticModel(n_states, n_actions)
+        self._neural_net = ActorCriticModel(
+            n_states, n_actions, hidden_layer_sizes)
 
         # Huber loss
         self._loss_function = keras.losses.Huber(
@@ -179,18 +182,18 @@ class WorkerPolicyActorCriticShared(WorkerPolicyREINFORCE):
         weights.append(
             np.array(response.layer.input_layer).reshape(
                 self._n_states,
-                self._n_vertices * self._n_vertices))
+                self._hidden_layer_sizes[0]))
         weights.append(np.array(response.layer.hidden_0))
         weights.append(np.array(response.layer.middle_0).reshape(
-            self._n_vertices * self._n_vertices,
-            self._n_vertices * self._n_vertices))
+            self._hidden_layer_sizes[0],
+            self._hidden_layer_sizes[1]))
         weights.append(np.array(response.layer.hidden_1))
         weights.append(np.array(response.layer.output_layer).reshape(
-            self._n_vertices * self._n_vertices,
+            self._hidden_layer_sizes[1],
             self._n_actions))
         weights.append(np.array(response.layer.output))
         weights.append(np.array(response.layer.critic_output_layer).reshape(
-            self._n_vertices * self._n_vertices,
+            self._hidden_layer_sizes[1],
             1))
         weights.append(np.array(response.layer.critic_output))
         self.set_policy_weights(weights)
@@ -205,13 +208,14 @@ class WorkerPolicyActorCriticDual(WorkerPolicyREINFORCE):
             n_actions: int,
             alpha: float,
             gamma: float,
+            hidden_layer_sizes: List[int],
             use_gpu: bool = False) -> None:
         """Initialize the ModelActorCritic class."""
-        super().__init__(n_states, n_actions, alpha, gamma, use_gpu)
+        super().__init__(n_states, n_actions, alpha, gamma, hidden_layer_sizes, use_gpu)
 
         # Use Actor-Critic model instead of that within WorkerPolicyREINFORCE.
-        self._neural_net = ActorModel(n_states, n_actions)
-        self._critic_net = CriticModel(n_states)
+        self._neural_net = ActorModel(n_states, n_actions, hidden_layer_sizes)
+        self._critic_net = CriticModel(n_states, hidden_layer_sizes)
 
         # Huber loss
         self._loss_function = keras.losses.Huber(
@@ -377,10 +381,6 @@ class WorkerPolicyActorCriticDual(WorkerPolicyREINFORCE):
             request.layer.hidden_0 = (self._gradients[1].numpy()).flatten().tolist()
             request.layer.middle_0 = (self._gradients[2].numpy()).flatten().tolist()
             request.layer.hidden_1 = (self._gradients[3].numpy()).flatten().tolist()
-            # request.layer.middle_1 = (self._gradients[4].numpy()).flatten().tolist()
-            # request.layer.hidden_2 = (self._gradients[5].numpy()).flatten().tolist()
-            # request.layer.output_layer = (self._gradients[6].numpy()).flatten().tolist()
-            # request.layer.output = (self._gradients[7].numpy()).flatten().tolist()
             request.layer.output_layer = (self._gradients[4].numpy()).flatten().tolist()
             request.layer.output = (self._gradients[5].numpy()).flatten().tolist()
 
@@ -389,10 +389,6 @@ class WorkerPolicyActorCriticDual(WorkerPolicyREINFORCE):
             request.layer.hidden_0 = (self._critic_gradients[1].numpy()).flatten().tolist()
             request.layer.middle_0 = (self._critic_gradients[2].numpy()).flatten().tolist()
             request.layer.hidden_1 = (self._critic_gradients[3].numpy()).flatten().tolist()
-            # request.layer.middle_1 = (self._critic_gradients[4].numpy()).flatten().tolist()
-            # request.layer.hidden_2 = (self._critic_gradients[5].numpy()).flatten().tolist()
-            # request.layer.output_layer = (self._critic_gradients[6].numpy()).flatten().tolist()
-            # request.layer.output = (self._critic_gradients[7].numpy()).flatten().tolist()
             request.layer.output_layer = (self._critic_gradients[4].numpy()).flatten().tolist()
             request.layer.output = (self._critic_gradients[5].numpy()).flatten().tolist()
 
@@ -407,26 +403,22 @@ class WorkerPolicyActorCriticDual(WorkerPolicyREINFORCE):
         weights.append(
             np.array(response.layer.input_layer).reshape(
                 self._n_states,
-                self._n_vertices * self._n_vertices))
+                self._hidden_layer_sizes[0]))
         weights.append(np.array(response.layer.hidden_0))
         weights.append(np.array(response.layer.middle_0).reshape(
-            self._n_vertices * self._n_vertices,
-            self._n_vertices * self._n_vertices))
+            self._hidden_layer_sizes[0],
+            self._hidden_layer_sizes[1]))
         weights.append(np.array(response.layer.hidden_1))
-        # weights.append(np.array(response.layer.middle_1).reshape(
-        #     self._n_vertices * self._n_vertices,
-        #     self._n_vertices * self._n_vertices))
-        # weights.append(np.array(response.layer.hidden_2))
 
         if network_type == 'actor':
             weights.append(np.array(response.layer.output_layer).reshape(
-                self._n_vertices * self._n_vertices,
+                self._hidden_layer_sizes[1],
                 self._n_actions))
             weights.append(np.array(response.layer.output))
 
         else:
             weights.append(np.array(response.layer.output_layer).reshape(
-                self._n_vertices * self._n_vertices,
+                self._hidden_layer_sizes[1],
                 1))
             weights.append(np.array(response.layer.output))
 

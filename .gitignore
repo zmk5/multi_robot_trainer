@@ -49,6 +49,7 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
+COLCON_IGNORE
 
 # zmk5
 .vscode

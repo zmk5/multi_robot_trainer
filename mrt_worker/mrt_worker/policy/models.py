@@ -2,6 +2,7 @@
 
 Written by: Zahi Kakish (zmk5)
 """
+from typing import List
 from typing import Optional
 from typing import Tuple
 
@@ -13,13 +14,17 @@ from tensorflow import Tensor
 class ActorCriticModel(keras.Model):
     """Class containining joint network for Actor-Critic NN model."""
 
-    def __init__(self, n_states: int, n_vertices: int, n_actions: int) -> None:
+    def __init__(
+            self,
+            n_states: int,
+            n_actions: int,
+            hidden_layer_sizes: List[int]) -> None:
         """Initialize ActorCriticModel class."""
         super().__init__()
         self._layer_hidden_0 = keras.layers.Dense(
-            n_vertices * n_vertices, input_shape=(n_states,), activation="relu")
+            hidden_layer_sizes[0], input_shape=(n_states,), activation="relu")
         self._layer_hidden_1 = keras.layers.Dense(
-            n_vertices * n_vertices, activation="relu")
+            hidden_layer_sizes[1], activation="relu")
         self._layer_output_actor = keras.layers.Dense(n_actions)
         self._layer_output_critic = keras.layers.Dense(1)
 
@@ -37,15 +42,17 @@ class ActorCriticModel(keras.Model):
 class ActorModel(keras.Model):
     """Class containining separate network for Actor NN model."""
 
-    def __init__(self, n_states: int, n_vertices: int, n_actions: int) -> None:
+    def __init__(
+            self,
+            n_states: int,
+            n_actions: int,
+            hidden_layer_sizes: List[int]) -> None:
         """Initialize ActorModel class."""
         super().__init__()
         self._layer_hidden_0 = keras.layers.Dense(
-            n_vertices * n_vertices, input_shape=(n_states,), activation="relu")
+            hidden_layer_sizes[0], input_shape=(n_states,), activation="relu")
         self._layer_hidden_1 = keras.layers.Dense(
-            n_vertices * n_vertices, activation="relu")
-        # self._layer_hidden_2 = keras.layers.Dense(
-        #     n_vertices * n_vertices, activation="relu")
+            hidden_layer_sizes[1], activation="relu")
         self._layer_output = keras.layers.Dense(n_actions)
 
     def call(
@@ -56,22 +63,22 @@ class ActorModel(keras.Model):
         """Forward pass of the Actor neural network."""
         x = self._layer_hidden_0(inputs)
         x = self._layer_hidden_1(x)
-        # x = self._layer_hidden_2(x)
         return self._layer_output(x)
 
 
 class CriticModel(keras.Model):
     """Class containining separate network for Critic NN model."""
 
-    def __init__(self, n_states: int, n_vertices: int) -> None:
+    def __init__(
+            self,
+            n_states: int,
+            hidden_layer_sizes: List[int]) -> None:
         """Initialize CriticModel class."""
         super().__init__()
         self._layer_hidden_0 = keras.layers.Dense(
-            n_vertices * n_vertices, input_shape=(n_states,), activation="relu")
+            hidden_layer_sizes[0], input_shape=(n_states,), activation="relu")
         self._layer_hidden_1 = keras.layers.Dense(
-            n_vertices * n_vertices, activation="relu")
-        # self._layer_hidden_2 = keras.layers.Dense(
-        #     n_vertices * n_vertices, activation="relu")
+            hidden_layer_sizes[1], activation="relu")
         self._layer_output = keras.layers.Dense(1)
 
     def call(
@@ -82,5 +89,4 @@ class CriticModel(keras.Model):
         """Forward pass of the Critic neural network."""
         x = self._layer_hidden_0(inputs)
         x = self._layer_hidden_1(x)
-        # x = self._layer_hidden_2(x)
         return self._layer_output(x)
