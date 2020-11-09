@@ -1,0 +1,26 @@
+server_node:
+    ros__parameters:
+        number:
+            states: 4
+            actions: 5
+            episodes: 5000
+            workers: 6
+        hyperparameter:
+            alpha: 0.001
+            epsilon: 1.0
+        training_delay: 0
+
+tester_node:
+    ros__parameters:
+        number:
+            states: 4
+            actions: 5
+            iterations: 1000
+        hyperparameter:
+            alpha: 0.3
+            beta: 0.1
+            gamma: 0.99
+            epsilon: 0.001
+        database:
+            local_size: 10000
+        decay_rate: 500

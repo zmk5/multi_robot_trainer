@@ -22,7 +22,6 @@ class WorkerParameters():
         'beta',
         'gamma',
         'epsilon',
-        'mse',
         'decay_rate',
         'training_delay',
         'batch_size'
@@ -35,7 +34,6 @@ class WorkerParameters():
     beta: float          # default: 0.1
     gamma: float         # default: 0.99
     epsilon: float       # default: 1.0
-    mse: float           # default: 0.05
     decay_rate: int      # default: 500
     training_delay: int  # default: 100
     batch_size: int      # default: 16

@@ -1,0 +1,107 @@
+wn_0:
+    worker_node:
+        ros__parameters:
+            use_gpu: False
+            number:
+                states: 4
+                actions: 5
+                iterations: 4000
+            hyperparameter:
+                alpha: 1.0
+                beta: 0.1
+                gamma: 0.99
+                epsilon: 1.0
+            database:
+                local_size: 10000
+            decay_rate: 10
+            training_delay: 0
+
+wn_1:
+    worker_node:
+        ros__parameters:
+            use_gpu: False
+            number:
+                states: 4
+                actions: 5
+                iterations: 4000
+            hyperparameter:
+                alpha: 1.0
+                beta: 0.1
+                gamma: 0.99
+                epsilon: 1.0
+            database:
+                local_size: 10000
+            decay_rate: 10
+            training_delay: 0
+
+wn_2:
+    worker_node:
+        ros__parameters:
+            use_gpu: False
+            number:
+                states: 4
+                actions: 5
+                iterations: 4000
+            hyperparameter:
+                alpha: 1.0
+                beta: 0.1
+                gamma: 0.99
+                epsilon: 1.0
+            database:
+                local_size: 10000
+            decay_rate: 10
+            training_delay: 0
+
+wn_3:
+    worker_node:
+        ros__parameters:
+            use_gpu: False
+            number:
+                states: 4
+                actions: 5
+                iterations: 4000
+            hyperparameter:
+                alpha: 1.0
+                beta: 0.1
+                gamma: 0.99
+                epsilon: 1.0
+            database:
+                local_size: 10000
+            decay_rate: 10
+            training_delay: 0
+
+wn_4:
+    worker_node:
+        ros__parameters:
+            use_gpu: False
+            number:
+                states: 4
+                actions: 5
+                iterations: 4000
+            hyperparameter:
+                alpha: 1.0
+                beta: 0.1
+                gamma: 0.99
+                epsilon: 1.0
+            database:
+                local_size: 10000
+            decay_rate: 10
+            training_delay: 0
+
+wn_5:
+    worker_node:
+        ros__parameters:
+            use_gpu: False
+            number:
+                states: 4
+                actions: 5
+                iterations: 4000
+            hyperparameter:
+                alpha: 1.0
+                beta: 0.1
+                gamma: 0.99
+                epsilon: 1.0
+            database:
+                local_size: 10000
+            decay_rate: 10
+            training_delay: 0

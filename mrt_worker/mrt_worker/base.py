@@ -40,7 +40,6 @@ class WorkerBase(Node):
                 ('hyperparameter.beta', 0.1),
                 ('hyperparameter.gamma', 0.99),
                 ('hyperparameter.epsilon', 1.0),
-                ('hyperparameter.mse', 0.05),
                 ('database.local_size', 10000),
                 ('training_delay', 100),
                 ('decay_rate', 500),
@@ -56,7 +55,6 @@ class WorkerBase(Node):
             self.get_parameter('hyperparameter.beta').value,
             self.get_parameter('hyperparameter.gamma').value,
             self.get_parameter('hyperparameter.epsilon').value,
-            self.get_parameter('hyperparameter.mse').value,
             self.get_parameter('decay_rate').value,
             self.get_parameter('training_delay').value,
             self.get_parameter('batch_size').value
