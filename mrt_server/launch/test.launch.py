@@ -69,7 +69,7 @@ def generate_launch_description():
         ),
         Node(
             package='mrt_server',
-            executable='server_sync_dual_node',
+            executable='server_sync_node',  # server_sync_dual_node or server_async_node
             name='server_node',
             output='screen',
             parameters=[LaunchConfiguration('yaml_file_server')],
