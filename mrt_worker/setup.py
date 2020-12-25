@@ -24,6 +24,7 @@ setup(
             'worker_sync_node = mrt_worker.sync:main',
             'worker_sync_dual_node = mrt.sync_dual:main',
             'worker_async_node = mrt_worker.async:main',
+            'worker_async_dual_node = mrt.async_dual:main',
             'tester_node = mrt_worker.test:main',
         ],
     },

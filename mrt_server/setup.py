@@ -24,6 +24,7 @@ setup(
             'server_sync_node = mrt_server.sync:main',
             'server_sync_dual_node = mrt_server.sync_dual:main',
             'server_async_node = mrt_server.async:main',
+            'server_async_dual_node = mrt_server.async_dual:main',
         ],
     },
 )
